@@ -9,6 +9,7 @@ type WardrobeItem = {
   id: string;
   name: string;
   category: string;
+  classification: string;
   colors: string[];
   fit: string;
   size: string;
@@ -25,6 +26,8 @@ const FORMALITY_OPTIONS = [
   "Business Casual",
   "Formal",
 ];
+
+const CATEGORY_OPTIONS = ["Top", "Bottom", "Shoes"];
 
 const SEASON_OPTIONS = ["Spring", "Summer", "Fall", "Winter"];
 
@@ -85,6 +88,7 @@ function WardrobeCard({
             <h3 className="text-base font-semibold text-slate-900">{item.name}</h3>
             <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
               {item.category}
+              {item.classification ? ` • ${item.classification}` : ""}
             </span>
           </div>
           <div className="ml-auto flex items-center gap-1">
@@ -163,6 +167,9 @@ type AddItemModalProps = {
 function AddItemModal({ onClose, onSave, initialItem, title }: AddItemModalProps) {
   const [name, setName] = useState(initialItem?.name ?? "");
   const [category, setCategory] = useState(initialItem?.category ?? "");
+  const [classification, setClassification] = useState(
+    initialItem?.classification ?? "",
+  );
   const [colorsInput, setColorsInput] = useState(
     initialItem?.colors?.join(", ") ?? "",
   );
@@ -209,7 +216,7 @@ function AddItemModal({ onClose, onSave, initialItem, title }: AddItemModalProps
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim() || !category.trim()) return;
+    if (!name.trim() || !category.trim() || !classification.trim()) return;
 
     const colors = colorsInput
       .split(",")
@@ -220,6 +227,7 @@ function AddItemModal({ onClose, onSave, initialItem, title }: AddItemModalProps
       {
         name: name.trim(),
         category: category.trim(),
+        classification: classification.trim(),
         colors,
         fit: fit.trim(),
         size: size.trim(),
@@ -252,7 +260,7 @@ function AddItemModal({ onClose, onSave, initialItem, title }: AddItemModalProps
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="grid gap-3 md:grid-cols-3">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wide text-slate-600">
                 Name *
@@ -276,6 +284,24 @@ function AddItemModal({ onClose, onSave, initialItem, title }: AddItemModalProps
                 placeholder="e.g. Jacket, T‑shirt, Jeans"
                 required
               />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+                Classification *
+              </label>
+              <select
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-300"
+                value={classification}
+                onChange={(e) => setClassification(e.target.value)}
+                required
+              >
+                <option value="">Select classification</option>
+                {CATEGORY_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -726,6 +752,7 @@ export default function WardrobePage() {
               ? {
                   name: editingItem.name,
                   category: editingItem.category,
+                  classification: editingItem.classification,
                   colors: editingItem.colors,
                   fit: editingItem.fit,
                   size: editingItem.size,

@@ -53,6 +53,7 @@ export async function PATCH(
     const fields = [
       "name",
       "category",
+      "classification",
       "colors",
       "fit",
       "size",
@@ -91,6 +92,7 @@ export async function PATCH(
         id: doc._id.toString(),
         name: doc.name,
         category: doc.category,
+        classification: doc.classification ?? "",
         colors: doc.colors ?? [],
         fit: doc.fit ?? "",
         size: doc.size ?? "",
@@ -148,4 +150,3 @@ export async function DELETE(
     );
   }
 }
-

@@ -7,7 +7,7 @@ import { adminAuth } from "@/lib/firebaseAdmin";
  *   → returns all wardrobe items for the authenticated user
  *
  * POST /api/wardrobe
- *   body: { name, category, colors?, fit?, size?, formality?, seasons?, occasions?, notes? }
+ *   body: { name, category, classification, colors?, fit?, size?, formality?, seasons?, occasions?, notes? }
  *   → creates a wardrobe item tied to the authenticated user
  *
  * The user is derived from the Firebase ID token in the Authorization header:
@@ -59,6 +59,7 @@ export async function GET(request: NextRequest) {
       _id: { toString(): string };
       name: string;
       category: string;
+      classification?: string;
       colors?: string[];
       fit?: string;
       size?: string;
@@ -79,6 +80,7 @@ export async function GET(request: NextRequest) {
         id: item._id.toString(),
         name: item.name,
         category: item.category,
+        classification: item.classification ?? "",
         colors: item.colors ?? [],
         fit: item.fit ?? "",
         size: item.size ?? "",
@@ -113,6 +115,7 @@ export async function POST(request: NextRequest) {
     const {
       name,
       category,
+      classification,
       colors = [],
       fit = "",
       size = "",
@@ -122,9 +125,9 @@ export async function POST(request: NextRequest) {
       notes = "",
     } = body;
 
-    if (!name || !category) {
+    if (!name || !category || !classification) {
       return NextResponse.json(
-        { error: "name and category are required" },
+        { error: "name, category and classification are required" },
         { status: 400 },
       );
     }
@@ -135,6 +138,7 @@ export async function POST(request: NextRequest) {
       user: userId,
       name: String(name).trim(),
       category: String(category).trim(),
+      classification: String(classification).trim(),
       colors: Array.isArray(colors) ? colors : [],
       fit: String(fit || "").trim() || undefined,
       size: String(size || "").trim() || undefined,
@@ -150,6 +154,7 @@ export async function POST(request: NextRequest) {
           id: itemDoc._id.toString(),
           name: itemDoc.name,
           category: itemDoc.category,
+          classification: itemDoc.classification ?? "",
           colors: itemDoc.colors ?? [],
           fit: itemDoc.fit ?? "",
           size: itemDoc.size ?? "",
@@ -169,5 +174,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
 
