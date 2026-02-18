@@ -56,15 +56,19 @@ export async function POST(request: NextRequest) {
       _id: { toString(): string };
       name: string;
       category: string;
+      isAvailable?: boolean;
       colors?: string[];
       formality?: string;
       occasions?: string[];
     };
-    const items = (await WardrobeItem.find({ user: userId }).lean().exec()) as unknown as WardrobeItemLean[];
+    const items = (await WardrobeItem.find({
+      user: userId,
+      isAvailable: { $ne: false },
+    }).lean().exec()) as unknown as WardrobeItemLean[];
 
     if (items.length < 2) {
       return NextResponse.json(
-        { error: "Add at least 2 items to your wardrobe to get recommendations" },
+        { error: "Add at least 2 available items to get recommendations" },
         { status: 400 }
       );
     }
